@@ -19324,9 +19324,16 @@ color:black;
   box-shadow : 0 0 0px rgba(0,0,0,.125), 2px 2px 8px rgba(0,0,0,.2);
 }
 
+#Add_task{
+  text-align:center;
+  color: #ebebeb;
+  font-size:100px;
+  margin-top:250px;
+ }
+
 .scroll{
   max-height: 500px;
-  overflow-y: scroll;
+  overflow-y: auto;
   padding-top:3px;
 }
 

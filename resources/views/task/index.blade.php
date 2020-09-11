@@ -109,8 +109,18 @@
                 <div class="col-md-1">
                 </div>
                 <div class="col-md-9 scroll mt-4">
-                @foreach($tasks as $task)
-                    @if(Auth::id() == $task->created_by_id)
+                
+               @if(count(\App\Task::where('created_by_id', Auth::id())->get()) == 0)
+
+                        <div id ="Add_task">
+                            <h2 style="font-weight:800">ADD NEW TASK</h2>
+                        </div>
+                    
+                @else
+
+                    @foreach($tasks as $task)
+                        @if(Auth::id() == $task->created_by_id)
+                        
                     <div class="card chatbox">
                             <div class="card-header">
                                 <!-- <a href="#" class="float-right" data-toggle="modal" data-target="#shareTask"><p><i class="fas fa-share"></i>  Share task</p></a> -->
@@ -121,17 +131,17 @@
                                 <p style="font-weight:400;font-size:15px; width:80%; overflow:hidden; text-overflow:ellipsis; white-space:nowrap;"> {{$task->task_body}}</p>
                             </div>
                             <div class="card-footer-chat">
-                               <div style="column-width:50%">
-                                   <p>
+                            <div style="column-width:50%">
+                                <p>
                                     {{\Carbon\Carbon::createFromTimeStamp(strtotime($task->due_date))->diffForHumans()}}
-                                       <a href="#" class="text-danger float-right" data-toggle="modal" data-target="#delete-modal-{{$task->id}}" style="margin-left:10px;color:white"><i class="fas fa-trash"></i></a> 
-                                       <a href="#" class="text-success float-right" data-toggle="modal" data-target="#editTask-{{$task->id}}" style="margin-left:10px"><i class="fas fa-edit"></i></a>
-                                       <a onclick="charle(this)" class="float-right text-info" data-toggle="modal" data-target="#view-task" data-taskTitle="{{$task->task_title}}" data-taskBody="{{$task->task_body}}" data-dateCreated="{{$task->created_at}}" data-dueDate="{{$task->due_date}}"><i class="fas fa-search-plus"></i></a>
-                                   </p>
-                               </div>
+                                    <a href="#" class="text-danger float-right" data-toggle="modal" data-target="#delete-modal-{{$task->id}}" style="margin-left:10px;color:white"><i class="fas fa-trash"></i></a> 
+                                    <a href="#" class="text-success float-right" data-toggle="modal" data-target="#editTask-{{$task->id}}" style="margin-left:10px"><i class="fas fa-edit"></i></a>
+                                    <a onclick="charle(this)" class="float-right text-info" data-toggle="modal" data-target="#view-task" data-taskTitle="{{$task->task_title}}" data-taskBody="{{$task->task_body}}" data-dateCreated="{{$task->created_at}}" data-dueDate="{{$task->due_date}}"><i class="fas fa-search-plus"></i></a>
+                                </p>
+                            </div>
                             </div>
                         
-                             <!-- Edit Task Modal -->
+                            <!-- Edit Task Modal -->
                             <div class="modal fade" id="editTask-{{$task->id}}" tabindex="-1" role="dialog" aria-labelledby="exampleModalCenterTitle" aria-hidden="true" data-backdrop="static" >
                                 <div class="modal-dialog modal-dialog-centered" role="document">
                                     <div class="modal-content">
@@ -230,12 +240,16 @@
                                 </div>
                             </div>
                     </div>  
-                  
-                    @else
-                
-                    @endif
 
-                @endforeach       
+                        @else
+
+                        @endif
+
+                    @endforeach 
+
+                @endif
+           
+
                 </div>
                 <div class="col-md-1">
                     <button class="btn waves-effect float" data-toggle="modal" data-target="#AddTask">
@@ -303,7 +317,7 @@
                                         </div>
                                         <div class="col-sm-10">
                                         <button type="reset" class="btn btn-warning mr-3" style="border-radius:3px; padding-right: 45px;padding-left: 45px; padding-top:2px; padding-bottom: 2px;">Undo</button>
-                                        <button type="submit" class="btn btn-primary float-right" style="border-radius:3px;padding-right: 45px;padding-left: 45px; padding-top:2px; padding-bottom: 2px;">Apply Changes</button>              
+                                        <button type="submit" onclick="removeElement()" class="btn btn-primary float-right" style="border-radius:3px;padding-right: 45px;padding-left: 45px; padding-top:2px; padding-bottom: 2px;">Add Task</button>              
                                     </div>
                 
                                     </div>
@@ -328,42 +342,41 @@
                     </div>
                     <div class="modal-body">
                         <div class="row">
-                            <div class="col-lg-12">
-                                <table style="width:100%">
-                                    <tr>
-                                        <th>
-                                            Task Description
-                                        </th>
-                                        <td id="taskBody">
-                                            
-                                        </td>
-                                    </tr>
-                                    <tr>
-                                        <th>
-                                            Date Created
-                                        </th>
-                                        <td id="dateCreated">
+                            <table width="100%">
+                                <tr>
+                                    <th>
+                                        Task Description
+                                    </th>
+                                    <td id="taskBody">
 
-                                        </td>
-                                    </tr>
-                                    <tr>
-                                        <th>
-                                            Due Date
-                                        </th>
-                                        <td id="dueDate">
+                                    </td>
+                                </tr>
+                                <tr>
+                                    <th>
+                                        Date Created
+                                    </th>
+                                    <td id="dateCreated">
 
-                                        </td>
-                                    </tr>
-                                    <tr>
-                                        <th>
-                                            Shared With:
-                                        </th>
-                                        <td>
-                                            
-                                        </td>
-                                    </tr>
-                                </table>
-                            </div>
+                                    </td>
+                                </tr>
+                                <tr>
+                                    <th>
+                                        Due Date
+                                    </th>
+                                    <td id="dueDate">
+
+                                    </td>
+                                </tr>
+                                <tr>
+                                    <th>
+                                        Shared With
+                                    </th>
+                                    <td>
+                                        Ama Akosua | John James | Sarah Abraham
+                                    </td>
+                                </tr>
+
+                            </table>
                         </div>
                     </div>
                 </div>  
@@ -436,6 +449,12 @@
   <script src="https://stackpath.bootstrapcdn.com/bootstrap/4.4.1/js/bootstrap.min.js"></script>
   <script type="text/javascript">
     
+    function removeElement(delAdd) {
+    // Removes an element from the document
+    var element = document.getElementById(delAdd);
+    element.parentNode.removeChild(element);
+    }
+
     function charle(element)
     {
         var taskBody = element.getAttribute("data-taskBody");
@@ -500,4 +519,12 @@
     }
     function submitForm()
     { 
-        // Call subm
+        // Call submit() method on <form id='myform'>
+        document.getElementById('myform').submit();
+    }  
+    
+
+  </script>
+
+</body>
+</html>
