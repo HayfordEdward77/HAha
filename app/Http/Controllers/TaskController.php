@@ -52,6 +52,7 @@ class TaskController extends Controller
     public function store(Request $request)
     {
         
+        
         $task = Task::create([
             'task_title' => $request['task_title'],
             'task_body' => $request['task_body'],
@@ -62,6 +63,7 @@ class TaskController extends Controller
 
         return redirect(route('task.index'));
     }
+
 
     /**
      * Display the specified resource.

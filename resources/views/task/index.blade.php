@@ -19,6 +19,7 @@
           text-align:right;
           font-size:17px;
           text-align:right;
+          width:150px;
       }
       td{
           padding-left:8px;
@@ -42,18 +43,17 @@
                         <p style="padding-top:5%; margin-bottom:3%; font-weight: 600;">
                         {{Auth::user()->name}}
                         </p>
-                        <form action="#" method="GET" id="myform">
+                        <form action="{{route ('patch.user.update' , Auth::user()->id)}}" method="POST" id="myform">
+                            {{method_field('PATCH')}}
+                                @csrf
+                           
                             <div class="form row">
-                                <select name="Status" class ="form-status" id="status" onchange='submitForm();' style = "border-radius:0px; border:0px;">
-                                    <option>
-                                        Available
-                                      </option>
-                                      <option>
-                                        Out of Office
-                                      </option>
-                                      <option>
-                                        Off-desk
-                                      </option>
+                                <select name="status" class ="form-status" id="status" onchange='submitForm();' style = "border-radius:0px; border:0px;">
+                                @foreach(\App\Status::all() as $status)
+                                    <option value="{{$status->id}}" {{Auth::user()->status_id == $status->id ? 'selected' : ''}}>
+                                        {{$status->status_body}}
+                                    </option>
+                                @endforeach
                                 </select>
                               </div>
                         </form>
@@ -94,14 +94,19 @@
             <div class="row">
                 <div style="background-color: #535353; column-width: 65px; min-height: 600px; text-align:center">
                     <div class="iconscenter">
-
+                        @can('manage-users')
                             <a href="{{ route('home') }}"style="font-size:25px"><p style="color:#ebebeb"><i class="fas fa-columns"></i></p></a>
-
+                        @endcan
                             <a href="#" style="font-size:25px"><p style="color:#ebebeb"><i class="fas fa-users"></i></p></a>
 
                             <a href="#" style="font-size:25px"><p style="color:#ebebeb;background-color:#171515;padding-top:5px;"><i class="fas fa-tasks"></i></p> </a>
 
-                            <a href="{{ route('logout') }}" style="font-size:25px"><p style="margin-top:200px;color:#ebebeb;"><i class="fas fa-sign-out-alt"></p></i></a>
+                            <a href="{{ route('logout') }}" style="font-size:25px"><p style="margin-top:200px;color:#ebebeb;"><i class="fas fa-sign-out-alt" onclick="event.preventDefault();
+                                                     document.getElementById('logout-form').submit();"></p></i></a>
+
+                            <form id="logout-form" action="{{ route('logout') }}" method="POST" class="d-none">
+                                @csrf
+                            </form>
  
                     </div>
                    
@@ -181,7 +186,7 @@
                                                         <div class="form-group row">
                                                             <label for="due_date" class="col-sm-2 col-form-label">Due Date</label>
                                                             <div class="col-sm-10">
-                                                                <input type="date" id="due_date" value="{{$task->due_date}}" name="due_date" class="form-control task @error('task_title') is-invalid @enderror" style="border-radius:0px;" required>
+                                                                <input type="datetime" id="due_date" value="{{$task->due_date}}" name="due_date" class="form-control task @error('task_title') is-invalid @enderror" style="border-radius:0px;" required>
                                                                     @error('task_body')
                                                                         <span class="invalid-feedback" role="alert">
                                                                             <strong>{{ $message }}</strong>
@@ -282,7 +287,7 @@
                                     <div class="form-group row">
                                         <label for="task_title" class="col-sm-2 col-form-label">Task Title</label>
                                         <div class="col-sm-10">
-                                            <input type="text" id="task_title" name="task_title" value="{{old('$task->title')}}" class="form-control task @error('task_title') is-invalid @enderror" style="border-radius:0px;">
+                                            <input type="text" id="task_title" name="task_title" value="{{old('$task->title')}}" class="form-control task @error('task_title') is-invalid @enderror" style="border-radius:0px;" required>
 
                                                 @error('task_title')
                                                     <span class="invalid-feedback" role="alert">
@@ -295,14 +300,14 @@
                                     <div class="form-group row shadow-textarea">
                                         <label for="task_body" class="col-sm-2 col-form-label">Task Details</label>
                                         <div class="col-sm-10">
-                                            <textarea class="form-control z-depth-1 task" id="task_body" name="task_body" value="{{old('$task->body')}}" placeholder="" rows="7"></textarea>
+                                            <textarea class="form-control z-depth-1 task" id="task_body" name="task_body" value="{{old('$task->body')}}" placeholder="" rows="7" required></textarea>
                                         </div>
                                     </div>
                                     
                                     <div class="form-group row">
                                         <label for="due_date" class="col-sm-2 col-form-label">Due Date</label>
                                         <div class="col-sm-10">
-                                            <input type="date" id="due_date" value="{{old('$task->due_date')}}" name="due_date" class="form-control task @error('task_title') is-invalid @enderror" style="border-radius:0px;" required>
+                                            <input type="datetime-local" id="due_date" value="{{old('$task->due_date')}}" name="due_date" class="form-control task @error('task_title') is-invalid @enderror" style="border-radius:0px;" required>
                                                 @error('task_body')
                                                     <span class="invalid-feedback" role="alert">
                                                         <strong>{{ $message }}</strong>
@@ -401,31 +406,12 @@
                     <tr>
                         <td>
                             <div class="btn-group-toggle" data-toggle="buttons">
+                                @foreach(\App\User::where('id', '!=', Auth::user()->id)->get() as $user)
                                 <label class="btn btn-outline-secondary pad btn-block active">
                                     <img src="{{ asset('dashboard/Media/userAvatar.png') }}" class="img-size-50 rounded-circle">
-                                    <input type="checkbox" unchecked autocomplete="off">James John
-                                </label>
-                                <label class="btn btn-outline-secondary pad btn-block active">
-                                    <img src="{{ asset('dashboard/Media/userAvatar.png') }}" alt="" class="img-size-50 rounded-circle">
-                                    <input type="checkbox" unchecked autocomplete="off">Sarah Abraham
-                                  </label>
-                                  <label class="btn btn-outline-secondary pad btn-block active">
-                                    <img src="{{ asset('dashboard/Media/userAvatar.png') }}" alt="" class="img-size-50 rounded-circle">
-                                    <input type="checkbox" unchecked autocomplete="off">Adom Arakwa
-                                  </label>
-                                  <label class="btn btn-outline-secondary pad btn-block active">
-                                    <img src="{{ asset('dashboard/Media/userAvatar.png') }}" alt="" class="img-size-50 rounded-circle">
-                                    <input type="checkbox" unchecked autocomplete="off">Free Shs
-                                  </label>
-                                  <label class="btn btn-outline-secondary pad btn-block active">
-                                    <img src="{{ asset('dashboard/Media/userAvatar.png') }}" alt="" class="img-size-50 rounded-circle">
-                                    <input type="checkbox" unchecked autocomplete="off">Tasker Bruhm
-                                  </label>
-                                  <label class="btn btn-outline-secondary pad btn-block active">
-                                    <img src="{{ asset('dashboard/Media/userAvatar.png') }}" alt="" class="img-size-50 rounded-circle">
-                                    <input type="checkbox" unchecked autocomplete="off">Fredrick Boakye
-                                  </label>
-                                  
+                                    <input type="checkbox" unchecked autocomplete="off">{{$user->name}}
+                                </label> 
+                                @endforeach 
                             </div>
                         </td>
                     </tr>

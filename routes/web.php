@@ -20,6 +20,7 @@ Route::get('/', function () {
 Auth::routes();
 
 Route::get('/home', 'HomeController@index')->name('home');
+Route::patch('user/{user}/update', 'Admin\UsersController@updateStatus')->name('patch.user.update');
 
 Route::resource('task', 'TaskController');
 

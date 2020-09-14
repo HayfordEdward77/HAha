@@ -4,7 +4,7 @@ use Illuminate\Database\Migrations\Migration;
 use Illuminate\Database\Schema\Blueprint;
 use Illuminate\Support\Facades\Schema;
 
-class CreateStatusTable extends Migration
+class AddStatusIdToUsersTable extends Migration
 {
     /**
      * Run the migrations.
@@ -13,10 +13,8 @@ class CreateStatusTable extends Migration
      */
     public function up()
     {
-        Schema::create('statuses', function (Blueprint $table) {
-            $table->increments('id');
-            $table->text('status_body');
-            $table->timestamps();
+        Schema::table('users', function (Blueprint $table) {
+            $table->integer('status_id')->nullable()->change();
         });
     }
 
@@ -27,6 +25,8 @@ class CreateStatusTable extends Migration
      */
     public function down()
     {
-        Schema::dropIfExists('statuses');
+        Schema::table('users', function (Blueprint $table) {
+            $table->dropColumn('status_id');
+        });
     }
 }
